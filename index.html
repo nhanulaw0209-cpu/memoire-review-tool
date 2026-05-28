@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memoire Saigon — Review Reply Tool</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: #faf8f5;
+      color: #2c2c2c;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container { max-width: 800px; margin: 0 auto; }
+
+    header { text-align: center; margin-bottom: 40px; }
+    header h1 { font-size: 28px; color: #8b1a1a; letter-spacing: 2px; text-transform: uppercase; }
+    header p { color: #888; font-size: 14px; margin-top: 6px; font-style: italic; }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #8b1a1a;
+    }
+
+    .collapse-btn {
+      background: none; border: none; cursor: pointer;
+      color: #aaa; font-size: 13px; letter-spacing: 0.5px;
+      font-family: inherit; padding: 2px 6px;
+    }
+    .collapse-btn:hover { color: #8b1a1a; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #8b1a1a;
+      margin-bottom: 6px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e0d9d0;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      color: #2c2c2c;
+      background: #fdfcfa;
+      resize: vertical;
+      transition: border-color 0.2s;
+      line-height: 1.6;
+    }
+    textarea:focus { outline: none; border-color: #8b1a1a; }
+
+    .api-row { display: flex; gap: 10px; align-items: center; }
+    .api-row input {
+      flex: 1; padding: 10px 14px;
+      border: 1.5px solid #e0d9d0; border-radius: 8px;
+      font-size: 14px; font-family: monospace;
+      background: #fdfcfa; color: #555;
+    }
+    .api-row input:focus { outline: none; border-color: #8b1a1a; }
+    .toggle-key {
+      background: none; border: none; cursor: pointer;
+      color: #888; font-size: 18px; padding: 4px 8px;
+    }
+
+    /* ── Example pairs ── */
+    .examples-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 14px; }
+
+    .example-item {
+      border: 1.5px solid #e0d9d0;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fdfcfa;
+    }
+
+    .example-item-header {
+      display: flex; align-items: center;
+      padding: 9px 14px;
+      background: #faf7f4;
+      border-bottom: 1px solid #e8e0d8;
+      gap: 10px;
+    }
+
+    .example-num {
+      font-size: 11px; font-weight: bold;
+      color: #8b1a1a; letter-spacing: 1px;
+      text-transform: uppercase; white-space: nowrap;
+    }
+
+    .example-preview {
+      flex: 1; font-size: 12px; color: #aaa;
+      font-style: italic; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .btn-remove {
+      background: none; border: none; cursor: pointer;
+      color: #ccc; font-size: 18px; line-height: 1;
+      padding: 0 2px; transition: color 0.15s;
+    }
+    .btn-remove:hover { color: #c0392b; }
+
+    .example-pair { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+
+    .pair-half label { color: #999; font-size: 11px; }
+
+    .pair-half textarea {
+      min-height: 70px;
+      font-size: 13px;
+      border-color: #ede7e0;
+    }
+
+    .pair-half.reply textarea { background: #fdf8f5; border-color: #ddd0c8; }
+
+    .btn-add-example {
+      width: 100%; padding: 11px;
+      background: white; color: #8b1a1a;
+      border: 1.5px dashed #d4a0a0; border-radius: 8px;
+      font-size: 14px; cursor: pointer; font-family: inherit;
+      letter-spacing: 0.5px; transition: all 0.2s;
+    }
+    .btn-add-example:hover { background: #fdf0f0; border-color: #8b1a1a; }
+
+    .examples-count { font-size: 12px; color: #aaa; font-style: italic; margin-top: 8px; }
+
+    /* ── Main review input ── */
+    #reviewInput { min-height: 120px; font-size: 15px; }
+
+    /* ── Generate button ── */
+    .btn-generate {
+      width: 100%; padding: 16px;
+      background: #8b1a1a; color: white;
+      border: none; border-radius: 10px;
+      font-size: 16px; letter-spacing: 1px; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s, transform 0.1s;
+      font-family: inherit; font-weight: bold;
+    }
+    .btn-generate:hover { background: #a02020; }
+    .btn-generate:active { transform: scale(0.99); }
+    .btn-generate:disabled { background: #ccc; cursor: not-allowed; }
+
+    /* ── Reply output ── */
+    .reply-box { display: none; }
+    .reply-box.visible { display: block; }
+
+    .reply-text {
+      width: 100%; padding: 14px;
+      border: 1.5px solid #e0d9d0; border-radius: 8px;
+      font-family: inherit; font-size: 15px; color: #2c2c2c;
+      background: #fdfcfa; resize: vertical;
+      min-height: 160px; line-height: 1.7;
+    }
+
+    .reply-actions { display: flex; gap: 10px; margin-top: 12px; }
+
+    .btn-copy {
+      flex: 1; padding: 12px;
+      background: #2c2c2c; color: white;
+      border: none; border-radius: 8px;
+      font-size: 14px; cursor: pointer;
+      font-family: inherit; letter-spacing: 0.5px; transition: background 0.2s;
+    }
+    .btn-copy:hover { background: #444; }
+
+    .btn-regenerate {
+      flex: 1; padding: 12px;
+      background: white; color: #8b1a1a;
+      border: 1.5px solid #8b1a1a; border-radius: 8px;
+      font-size: 14px; cursor: pointer;
+      font-family: inherit; letter-spacing: 0.5px; transition: all 0.2s;
+    }
+    .btn-regenerate:hover { background: #fdf0f0; }
+
+    .status {
+      text-align: center; font-size: 14px; color: #888;
+      font-style: italic; padding: 10px 0; display: none;
+    }
+    .status.visible { display: block; }
+
+    .error {
+      color: #c0392b; background: #fdf0f0;
+      border: 1px solid #e8c4c4; border-radius: 8px;
+      padding: 12px 16px; font-size: 14px; margin-top: 12px; display: none;
+    }
+    .error.visible { display: block; }
+
+    .hint { font-size: 12px; color: #aaa; margin-top: 6px; font-style: italic; }
+
+    .copied-msg { color: #2ecc71; font-size: 13px; text-align: center; margin-top: 6px; display: none; }
+    .copied-msg.visible { display: block; }
+
+    .collapsed { display: none; }
+
+    footer { text-align: center; margin-top: 40px; color: #bbb; font-size: 12px; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <h1>Memoire Saigon</h1>
+    <p>Google Review Reply Generator</p>
+  </header>
+
+  <!-- API Key -->
+  <div class="card">
+    <div class="card-header">
+      <span class="section-label">Groq API Key</span>
+      <button class="collapse-btn" onclick="toggleSection('apiBody', this)">Hide ▲</button>
+    </div>
+    <div id="apiBody">
+      <div class="api-row">
+        <input type="password" id="apiKey" placeholder="gsk_..." />
+        <button class="toggle-key" onclick="toggleKey()">👁</button>
+      </div>
+      <div style="margin-top:10px">
+        <label style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Model</label>
+        <select id="modelSelect" style="width:100%;padding:9px 12px;border:1.5px solid #e0d9d0;border-radius:8px;font-family:inherit;font-size:13px;color:#555;background:#fdfcfa;cursor:pointer">
+          <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (recommended)</option>
+          <option value="llama-3.1-70b-versatile">llama-3.1-70b-versatile</option>
+          <option value="mixtral-8x7b-32768">mixtral-8x7b-32768</option>
+          <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (fastest)</option>
+        </select>
+      </div>
+      <p class="hint">Lấy key miễn phí tại console.groq.com/keys — Key lưu trong browser, không gửi đi đâu ngoài Groq.</p>
+    </div>
+  </div>
+
+  <!-- Example Pairs -->
+  <div class="card">
+    <div class="card-header">
+      <span class="section-label">Training Examples</span>
+      <button class="collapse-btn" onclick="toggleSection('examplesBody', this)">Hide ▲</button>
+    </div>
+    <div id="examplesBody">
+      <p class="hint" style="margin-bottom:14px">Each example has the customer review + the owner reply. AI learns from both — context and response style.</p>
+      <div class="examples-list" id="examplesList"></div>
+      <button class="btn-add-example" onclick="addExample()">+ Add Example Pair</button>
+      <p class="examples-count" id="examplesCount"></p>
+    </div>
+  </div>
+
+  <!-- Review Input -->
+  <div class="card">
+    <label style="font-size:13px;color:#8b1a1a;margin-bottom:10px">New Customer Review</label>
+    <textarea id="reviewInput" placeholder="Paste the customer's Google review here..."></textarea>
+    <div class="error" id="errorMsg"></div>
+  </div>
+
+  <!-- Generate -->
+  <button class="btn-generate" id="generateBtn" onclick="generateReply()">✦ Generate Reply</button>
+  <div class="status" id="statusMsg">Generating reply...</div>
+
+  <!-- Reply Output -->
+  <div class="card reply-box" id="replyBox" style="margin-top:24px">
+    <label style="font-size:13px;color:#8b1a1a;margin-bottom:10px">Suggested Reply</label>
+    <textarea class="reply-text" id="replyOutput" rows="7"></textarea>
+    <div class="reply-actions">
+      <button class="btn-copy" onclick="copyReply()">Copy Reply</button>
+      <button class="btn-regenerate" onclick="generateReply()">↻ Regenerate</button>
+    </div>
+    <div class="copied-msg" id="copiedMsg">Copied to clipboard!</div>
+  </div>
+
+  <footer>Memoire Saigon · Sunderland, UK</footer>
+</div>
+
+<script>
+  const STORAGE_KEY = 'memoiresaigon_examples_v2';
+  const API_KEY_STORAGE = 'memoiresaigon_apikey';
+
+  const DEFAULT_EXAMPLES = [
+    {
+      review: ``,
+      reply: `Hi Anthony,\n\nThank you for such a glowing review! We're delighted you enjoyed the seafood platter, curry, and starters — and even more pleased you felt it was great value for the quality and quantity.\n\nWe'll look forward to welcoming you back… and promise the food will always be worth dipping into that pocket money fund again!\n\nKind regards,\nLily\nManager, The Stone Crab`
+    },
+    {
+      review: `Lan Y Môr was an absolute delight. The ambience is fabulous—stylish, relaxed, and perfect for a special evening out. The menu is wonderful, with highlights including a stunning steak cooked to perfection and delicious cocktails that were beautifully crafted. A special mention has to go to the corn ribs—I would go back just for those, they were that delicious!\n\nThe service was exceptional throughout, attentive without being intrusive, and made the whole experience feel effortless. I can't wait to return. Thank you for a truly wonderful evening.\nBridget x`,
+      reply: `Dear Bridget,\n\nThank you very much for taking the time to write about us here and for your great photos.\n\nThe team is really happy to see your feedback here and they are very happy to know their efforts have been recognised.\n\nIf I was you, I wouldn't share my corn ribs.\n\nKind regards,\nNikos Chatzitheodorakis\nRestaurant Manager`
+    },
+    {
+      review: `Incredibly attentive and warm staff who went above and beyond to cater for my dietary needs. The food was all beautifully cooked and presented. Charly's spritz cocktail was something else! Thank you so much for a wonderful evening that we won't forget.`,
+      reply: `Dear Harrison Family,\n\nThank you very much for your lovely review (and photos).\n\nI'm really glad you have enjoyed everything and especially the Pembrokeshire Spritz. A cocktail Charly made to honour the relationship we have with Velfrey Vineyard, a local winery with superb wine selection just down the road from our restaurant.\n\nHopefully, we will see you again soon (for more cocktails)\n\nKind regards,\nNikos Chatzitheodorakis\nRestaurant Manager`
+    },
+    {
+      review: `Awful. Served us the lowest quality fish in batter (!) instead of the lobster we were promised. Avoid it`,
+      reply: `Dear Ms Pugh,\n\nThank you for your message. I am truly sorry to read how disappointed you remain following your visit, and I regret that the situation has left you with this impression of us.\n\nFrom my review of the evening, it appears that the change to the menu was unfortunately not communicated to you clearly by the team before your order was taken. For that, I sincerely apologise. It should have been explained properly at the table so that you could make an informed decision, and I completely understand your frustration that this did not happen.\n\nPlease be assured that your comments have been taken seriously and discussed internally so we can ensure that changes to dishes or menus are always communicated properly to our guests in the future.\n\nWhile I understand that this experience has been disappointing for you, I do appreciate you taking the time to share your feedback, as it allows us to address situations like this with the team.\n\nKind regards,\nNikos Chatzitheodorakis\nRestaurant Manager`
+    },
+    {
+      review: `Terrible customer service and experience here today. They advertise an interesting and affordable set lunch and state it is available all summer. However, upon arrival we were told they aren't serving the set lunch today. There was no other explanation offered or even an attempt at an apology. The menu advertised on the website was also on display behind him outside the restaurant. Just thought it was really poor to be told they weren't serving what we had travelled there for despite it still being clearly advertised and without any justification or apology. Very disappointed and we won't be returning.`,
+      reply: `Dear Paul,\n\nThank you for taking the time to share your feedback. I am truly sorry that your visit was a disappointing experience, especially as you had planned your day around joining us for lunch.\n\nWe do offer our set lunch throughout the summer, but on rare occasions we need to adapt our service to maintain standards. This should always be explained clearly and with an apology — and I am very sorry that this was not your experience on the day.\n\nI also acknowledge the confusion caused by the menu boards and website, and we are reviewing how to make any service changes clearer in advance.\n\nI hope that, despite this experience, you may consider giving us another chance in the future to show you the relaxed hospitality and locally sourced food that so many of our guests enjoy.\n\nKind regards,\nNikos Chatzitheodorakis\nRestaurant Manager`
+    },
+    {
+      review: `We have had 2 lovely celebration meals here, a birthday and anniversary. The decor is lovely and the restaurant is light thanks to the thoughtful design and big windows overlooking the beach. Attention to detail means by use of a mirror even if your back is to the sea you still get to enjoy the view. The food is flavoursome, and there is a choice of small plates to share or a normal sized main. The staff are knowledgeable, helpful and friendly. The whole atmosphere here is attention to detail.`,
+      reply: `Dear Emma,\n\nThank you so much for your thoughtful and detailed review. We're honoured that you've chosen us for not just one, but two special celebrations — it truly means a lot to us.\n\nIt's wonderful to hear how much you've appreciated the design of the space and the flexibility of the menu. Your comments on the team, the atmosphere, and even the practical details like accessibility and cleanliness are greatly appreciated — attention to detail is something we care deeply about, so it's incredibly rewarding to hear that reflected in your experience.\n\nThank you again, and we look forward to welcoming you back for your next special occasion — or simply another lovely meal.\n\nWarm regards,\nNikos Chatzitheodorakis\nRestaurant Manager`
+    }
+  ];
+
+  // ── Init ────────────────────────────────────────────────────────
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    saveExamples(DEFAULT_EXAMPLES);
+  }
+
+  const apiKeyInput = document.getElementById('apiKey');
+  apiKeyInput.value = localStorage.getItem(API_KEY_STORAGE) || '';
+  apiKeyInput.addEventListener('input', () => {
+    localStorage.setItem(API_KEY_STORAGE, apiKeyInput.value.trim());
+  });
+
+  function toggleKey() {
+    apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
+  }
+
+  function toggleSection(id, btn) {
+    const body = document.getElementById(id);
+    const collapsed = body.classList.toggle('collapsed');
+    btn.textContent = collapsed ? 'Show ▼' : 'Hide ▲';
+  }
+
+  // ── Storage ─────────────────────────────────────────────────────
+  function loadExamples() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const data = JSON.parse(raw);
+    // migrate old format (array of strings)
+    return data.map(e => typeof e === 'string' ? { review: '', reply: e } : e);
+  }
+
+  function saveExamples(examples) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(examples));
+  }
+
+  // ── Render ──────────────────────────────────────────────────────
+  function renderExamples() {
+    const examples = loadExamples();
+    const list = document.getElementById('examplesList');
+    list.innerHTML = '';
+
+    examples.forEach((pair, i) => {
+      const preview = pair.reply ? pair.reply.substring(0, 55) + (pair.reply.length > 55 ? '…' : '') : 'Empty';
+      const item = document.createElement('div');
+      item.className = 'example-item';
+      item.innerHTML = `
+        <div class="example-item-header">
+          <span class="example-num">Example ${i + 1}</span>
+          <span class="example-preview" id="preview-${i}">${escHtml(preview)}</span>
+          <button class="btn-remove" onclick="removeExample(${i})" title="Remove">×</button>
+        </div>
+        <div class="example-pair">
+          <div class="pair-half review">
+            <label>Customer Review</label>
+            <textarea rows="3" placeholder="Paste the customer review here..." oninput="updateField(${i},'review',this.value)">${escHtml(pair.review || '')}</textarea>
+          </div>
+          <div class="pair-half reply">
+            <label>Owner Reply</label>
+            <textarea rows="4" placeholder="Paste the owner reply here..." oninput="updateField(${i},'reply',this.value);updatePreview(${i},this.value)">${escHtml(pair.reply || '')}</textarea>
+          </div>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+
+    const count = examples.filter(e => e.reply && e.reply.trim()).length;
+    document.getElementById('examplesCount').textContent =
+      count === 0 ? 'No examples yet — add some for better results.'
+      : `${count} example pair${count > 1 ? 's' : ''} saved — AI will match this style.`;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function addExample() {
+    const examples = loadExamples();
+    examples.push({ review: '', reply: '' });
+    saveExamples(examples);
+    renderExamples();
+    const items = document.querySelectorAll('.example-item');
+    if (items.length) items[items.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function removeExample(index) {
+    const examples = loadExamples();
+    examples.splice(index, 1);
+    saveExamples(examples);
+    renderExamples();
+  }
+
+  function updateField(index, field, value) {
+    const examples = loadExamples();
+    if (examples[index]) {
+      examples[index][field] = value;
+      saveExamples(examples);
+    }
+  }
+
+  function updatePreview(index, value) {
+    const el = document.getElementById(`preview-${index}`);
+    if (el) el.textContent = value ? value.substring(0, 55) + (value.length > 55 ? '…' : '') : 'Empty';
+  }
+
+  renderExamples();
+
+  // ── Generate ────────────────────────────────────────────────────
+  async function generateReply() {
+    const apiKey = document.getElementById('apiKey').value.trim();
+    const review = document.getElementById('reviewInput').value.trim();
+    const btn = document.getElementById('generateBtn');
+    const status = document.getElementById('statusMsg');
+    const errorMsg = document.getElementById('errorMsg');
+    const replyBox = document.getElementById('replyBox');
+    const copiedMsg = document.getElementById('copiedMsg');
+
+    errorMsg.classList.remove('visible');
+    copiedMsg.classList.remove('visible');
+
+    if (!apiKey) { showError('Please enter your Gemini API key.'); return; }
+    if (!review) { showError('Please paste a customer review first.'); return; }
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.classList.add('visible');
+    }
+
+    btn.disabled = true;
+    status.classList.add('visible');
+    replyBox.classList.remove('visible');
+
+    const examples = loadExamples().filter(e => e.reply && e.reply.trim());
+
+    let examplesBlock = '';
+    if (examples.length > 0) {
+      examplesBlock = `\nBelow are real examples of how this restaurant (or similar restaurants) reply to reviews. Study the tone, warmth, phrasing, and structure carefully — your reply must match this style:\n\n` +
+        examples.map((e, i) => {
+          const reviewPart = e.review && e.review.trim()
+            ? `Customer review:\n"""\n${e.review.trim()}\n"""\n\n`
+            : '';
+          return `--- Example ${i + 1} ---\n${reviewPart}Owner reply:\n"""\n${e.reply.trim()}\n"""`;
+        }).join('\n\n') + `\n`;
+    }
+
+    const prompt = `You are the manager of Memoire Saigon, a Vietnamese restaurant in Sunderland, UK.
+Write a professional, warm, and genuine Google review response.
+${examplesBlock}
+Guidelines:
+- Thank the customer by name if mentioned, otherwise "dear guest"
+- Address specific points they raised (food, service, ambiance, etc.)
+- Positive review: express sincere gratitude, highlight what they enjoyed, invite them back warmly
+- Negative review: apologise sincerely, acknowledge the issue without excuses, invite them to return
+- Keep it concise: 3–5 sentences
+- Tone: warm, genuine, professional — with a touch of Vietnamese hospitality
+- Do NOT be generic or robotic${examples.length > 0 ? '\n- Match the style and voice of the examples above' : ''}
+- End with: "The Memoire Saigon Team"
+- English only
+
+Customer review to respond to:
+"""
+${review}
+"""
+
+Write only the reply, nothing else.`;
+
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: document.getElementById('modelSelect').value,
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.8,
+          max_tokens: 350
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error?.message || `API error ${response.status}`);
+      }
+
+      const data = await response.json();
+      const reply = data.choices?.[0]?.message?.content;
+      if (!reply) throw new Error('No reply generated. Please try again.');
+
+      document.getElementById('replyOutput').value = reply.trim();
+      replyBox.classList.add('visible');
+      replyBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    } catch (err) {
+      errorMsg.textContent = `Error: ${err.message}`;
+      errorMsg.classList.add('visible');
+    } finally {
+      btn.disabled = false;
+      status.classList.remove('visible');
+    }
+  }
+
+  async function copyReply() {
+    const text = document.getElementById('replyOutput').value;
+    await navigator.clipboard.writeText(text);
+    const msg = document.getElementById('copiedMsg');
+    msg.classList.add('visible');
+    setTimeout(() => msg.classList.remove('visible'), 2000);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generateReply();
+  });
+</script>
+
+</body>
+</html>
