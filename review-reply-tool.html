@@ -618,7 +618,7 @@ Write the reply only. Nothing else.`;
       const reply = data.choices?.[0]?.message?.content;
       if (!reply) throw new Error('No reply generated. Please try again.');
 
-      const trimmedReply = reply.trim();
+      const trimmedReply = reply.trim().replace(/^./, c => c.toUpperCase());
       document.getElementById('replyOutput').value = trimmedReply;
       replyBox.classList.add('visible');
       replyBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
