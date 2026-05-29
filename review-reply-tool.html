@@ -397,34 +397,26 @@
 </div>
 
 <script>
-  const STORAGE_KEY = 'memoiresaigon_examples_v2';
+  const STORAGE_KEY = 'memoiresaigon_examples_v3';
   const API_KEY_STORAGE = 'memoiresaigon_apikey';
   const SAVED_REPLIES_KEY = 'memoiresaigon_saved_replies_v1';
 
   const DEFAULT_EXAMPLES = [
     {
-      review: ``,
-      reply: `Hi Anthony,\n\nThank you for such a glowing review! We're delighted you enjoyed the seafood platter, curry, and starters — and even more pleased you felt it was great value for the quality and quantity.\n\nWe'll look forward to welcoming you back… and promise the food will always be worth dipping into that pocket money fund again!\n\nKind regards,\nLily\nManager, The Stone Crab`
+      review: `Amazing food, loved the pho! Will definitely be back.`,
+      reply: `Cheers! The pho is one of our favourites to make, really glad it hit the spot. See you next time!\n\nBest,\nThe Memoire Saigon Team`
     },
     {
-      review: `Lan Y Môr was an absolute delight. The ambience is fabulous—stylish, relaxed, and perfect for a special evening out. The menu is wonderful, with highlights including a stunning steak cooked to perfection and delicious cocktails that were beautifully crafted. A special mention has to go to the corn ribs—I would go back just for those, they were that delicious!\n\nThe service was exceptional throughout, attentive without being intrusive, and made the whole experience feel effortless. I can't wait to return. Thank you for a truly wonderful evening.\nBridget x`,
-      reply: `Dear Bridget,\n\nThank you very much for taking the time to write about us here and for your great photos.\n\nThe team is really happy to see your feedback here and they are very happy to know their efforts have been recognised.\n\nIf I was you, I wouldn't share my corn ribs.\n\nKind regards,\nNikos Chatzitheodorakis\nRestaurant Manager`
+      review: `Came for dinner with my partner last Friday, the beef brisket pho was stunning, rich and full of flavour. Spring rolls were crispy and fresh. Staff were attentive without being over the top and the atmosphere was lovely. One of the best meals we've had in Sunderland.`,
+      reply: `So glad it all came together for you. The brisket pho takes a lot of work so it's great to hear it lands well. We hope to see you both back soon!\n\nBest,\nThe Memoire Saigon Team`
     },
     {
-      review: `Incredibly attentive and warm staff who went above and beyond to cater for my dietary needs. The food was all beautifully cooked and presented. Charly's spritz cocktail was something else! Thank you so much for a wonderful evening that we won't forget.`,
-      reply: `Dear Harrison Family,\n\nThank you very much for your lovely review (and photos).\n\nI'm really glad you have enjoyed everything and especially the Pembrokeshire Spritz. A cocktail Charly made to honour the relationship we have with Velfrey Vineyard, a local winery with superb wine selection just down the road from our restaurant.\n\nHopefully, we will see you again soon (for more cocktails)\n\nKind regards,\nNikos Chatzitheodorakis\nRestaurant Manager`
+      review: `Waited over 45 minutes for food that arrived cold. Mentioned it to the staff and they didn't seem bothered at all. Really disappointed.`,
+      reply: `That's not the evening you deserved and I'm sorry we let you down. You deserved better from us, thank you for telling us.\n\nBest,\nThe Memoire Saigon Team`
     },
     {
-      review: `Awful. Served us the lowest quality fish in batter (!) instead of the lobster we were promised. Avoid it`,
-      reply: `Dear Ms Pugh,\n\nThank you for your message. I am truly sorry to read how disappointed you remain following your visit, and I regret that the situation has left you with this impression of us.\n\nFrom my review of the evening, it appears that the change to the menu was unfortunately not communicated to you clearly by the team before your order was taken. For that, I sincerely apologise. It should have been explained properly at the table so that you could make an informed decision, and I completely understand your frustration that this did not happen.\n\nPlease be assured that your comments have been taken seriously and discussed internally so we can ensure that changes to dishes or menus are always communicated properly to our guests in the future.\n\nWhile I understand that this experience has been disappointing for you, I do appreciate you taking the time to share your feedback, as it allows us to address situations like this with the team.\n\nKind regards,\nNikos Chatzitheodorakis\nRestaurant Manager`
-    },
-    {
-      review: `Terrible customer service and experience here today. They advertise an interesting and affordable set lunch and state it is available all summer. However, upon arrival we were told they aren't serving the set lunch today. There was no other explanation offered or even an attempt at an apology. The menu advertised on the website was also on display behind him outside the restaurant. Just thought it was really poor to be told they weren't serving what we had travelled there for despite it still being clearly advertised and without any justification or apology. Very disappointed and we won't be returning.`,
-      reply: `Dear Paul,\n\nThank you for taking the time to share your feedback. I am truly sorry that your visit was a disappointing experience, especially as you had planned your day around joining us for lunch.\n\nWe do offer our set lunch throughout the summer, but on rare occasions we need to adapt our service to maintain standards. This should always be explained clearly and with an apology — and I am very sorry that this was not your experience on the day.\n\nI also acknowledge the confusion caused by the menu boards and website, and we are reviewing how to make any service changes clearer in advance.\n\nI hope that, despite this experience, you may consider giving us another chance in the future to show you the relaxed hospitality and locally sourced food that so many of our guests enjoy.\n\nKind regards,\nNikos Chatzitheodorakis\nRestaurant Manager`
-    },
-    {
-      review: `We have had 2 lovely celebration meals here, a birthday and anniversary. The decor is lovely and the restaurant is light thanks to the thoughtful design and big windows overlooking the beach. Attention to detail means by use of a mirror even if your back is to the sea you still get to enjoy the view. The food is flavoursome, and there is a choice of small plates to share or a normal sized main. The staff are knowledgeable, helpful and friendly. The whole atmosphere here is attention to detail.`,
-      reply: `Dear Emma,\n\nThank you so much for your thoughtful and detailed review. We're honoured that you've chosen us for not just one, but two special celebrations — it truly means a lot to us.\n\nIt's wonderful to hear how much you've appreciated the design of the space and the flexibility of the menu. Your comments on the team, the atmosphere, and even the practical details like accessibility and cleanliness are greatly appreciated — attention to detail is something we care deeply about, so it's incredibly rewarding to hear that reflected in your experience.\n\nThank you again, and we look forward to welcoming you back for your next special occasion — or simply another lovely meal.\n\nWarm regards,\nNikos Chatzitheodorakis\nRestaurant Manager`
+      review: `Food was okay but nothing special. Felt overpriced for what it was. Wouldn't rush back.`,
+      reply: `Sorry to hear it didn't quite land for you and we'll keep working on it. We'd love a chance to change your mind if you're ever up for giving us another go.\n\nBest,\nThe Memoire Saigon Team`
     }
   ];
 
