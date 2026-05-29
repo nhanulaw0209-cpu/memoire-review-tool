@@ -309,6 +309,22 @@
 
     .no-saved { text-align: center; color: #bbb; font-size: 14px; font-style: italic; padding: 20px 0; }
 
+    /* ── Review age toggle ── */
+    .toggle-row {
+      display: flex; gap: 10px; margin-bottom: 16px;
+    }
+    .toggle-option {
+      flex: 1; padding: 11px;
+      border: 1.5px solid #e0d9d0; border-radius: 8px;
+      background: white; color: #888;
+      font-family: inherit; font-size: 13px; cursor: pointer;
+      text-align: center; transition: all 0.2s; letter-spacing: 0.3px;
+    }
+    .toggle-option:hover { border-color: #8b1a1a; color: #8b1a1a; }
+    .toggle-option.active {
+      background: #8b1a1a; color: white; border-color: #8b1a1a;
+    }
+
     footer { text-align: center; margin-top: 40px; color: #bbb; font-size: 12px; font-style: italic; }
   </style>
 </head>
@@ -364,6 +380,12 @@
     <label style="font-size:13px;color:#8b1a1a;margin-bottom:10px">New Customer Review</label>
     <textarea id="reviewInput" placeholder="Paste the customer's Google review here..."></textarea>
     <div class="error" id="errorMsg"></div>
+  </div>
+
+  <!-- Review Age Toggle -->
+  <div class="toggle-row">
+    <button class="toggle-option active" id="toggleRecent" onclick="setReviewAge('recent')">Recent review</button>
+    <button class="toggle-option" id="toggleOld" onclick="setReviewAge('old')">Review từ lâu (4+ tháng)</button>
   </div>
 
   <!-- Generate -->
@@ -533,6 +555,15 @@
 
   renderExamples();
 
+  // ── Review age toggle ────────────────────────────────────────────
+  let reviewAge = 'recent';
+
+  function setReviewAge(val) {
+    reviewAge = val;
+    document.getElementById('toggleRecent').classList.toggle('active', val === 'recent');
+    document.getElementById('toggleOld').classList.toggle('active', val === 'old');
+  }
+
   // ── Generate ────────────────────────────────────────────────────
   async function generateReply() {
     const apiKey = document.getElementById('apiKey').value.trim();
@@ -600,6 +631,8 @@ Rules:
 - Length: short review (1–2 sentences) → reply in 1–2 sentences only. Longer review → 3–4 sentences max
 - Write in natural, everyday British English${examples.length > 0 ? '\n- Match the voice from the examples — that\'s the tone we\'re going for' : ''}
 - End with exactly this on two separate lines: "Best," then on the next line "The Memoire Saigon Team"
+
+Note: this review was ${reviewAge === 'old' ? 'written a long time ago (4+ months). Acknowledge that you\'re sorry to see it only now, mention that things have improved since, and still invite them back.' : 'written recently. Reply as normal.'}
 
 Customer review:
 """
