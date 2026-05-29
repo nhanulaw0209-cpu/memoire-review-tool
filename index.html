@@ -309,6 +309,26 @@
 
     .no-saved { text-align: center; color: #bbb; font-size: 14px; font-style: italic; padding: 20px 0; }
 
+    /* ── Export/Import ── */
+    .history-actions { display: flex; gap: 8px; margin-bottom: 14px; }
+    .btn-export, .btn-import {
+      padding: 7px 14px; border-radius: 7px;
+      font-family: inherit; font-size: 12px; cursor: pointer;
+      letter-spacing: 0.4px; transition: all 0.2s;
+    }
+    .btn-export {
+      background: white; color: #555;
+      border: 1.5px solid #e0d9d0;
+    }
+    .btn-export:hover { border-color: #8b1a1a; color: #8b1a1a; }
+    .btn-import {
+      background: white; color: #555;
+      border: 1.5px solid #e0d9d0;
+    }
+    .btn-import:hover { border-color: #8b1a1a; color: #8b1a1a; }
+    .import-msg { font-size: 12px; color: #2ecc71; margin-left: 6px; display: none; }
+    .import-msg.visible { display: inline; }
+
     /* ── Filter tabs ── */
     .filter-tabs {
       display: flex; gap: 8px; margin-bottom: 18px;
@@ -448,6 +468,12 @@
       <button class="collapse-btn" onclick="toggleSection('savedBody', this)">Hide ▲</button>
     </div>
     <div id="savedBody">
+      <div class="history-actions">
+        <button class="btn-export" onclick="exportHistory()">↓ Export JSON</button>
+        <button class="btn-import" onclick="document.getElementById('importFile').click()">↑ Import JSON</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importHistory(event)" />
+        <span class="import-msg" id="importMsg">Imported!</span>
+      </div>
       <div class="filter-tabs" id="filterTabs">
         <button class="filter-tab active" onclick="setFilter('all')" id="tab-all">All <span class="count" id="count-all">0</span></button>
         <button class="filter-tab" onclick="setFilter('draft')" id="tab-draft">Draft <span class="count" id="count-draft">0</span></button>
@@ -846,6 +872,39 @@ Write the reply only. Nothing else.`;
       `;
       list.appendChild(div);
     });
+  }
+
+  function exportHistory() {
+    const saved = loadSavedReplies();
+    const blob = new Blob([JSON.stringify(saved, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `memoire-review-history-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function importHistory(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const imported = JSON.parse(e.target.result);
+        if (!Array.isArray(imported)) throw new Error();
+        const existing = loadSavedReplies();
+        const existingIds = new Set(existing.map(r => r.id));
+        const merged = [...imported.filter(r => !existingIds.has(r.id)), ...existing];
+        localStorage.setItem(SAVED_REPLIES_KEY, JSON.stringify(merged));
+        renderSavedReplies();
+        const msg = document.getElementById('importMsg');
+        msg.textContent = `✓ Imported ${imported.length} replies!`;
+        msg.classList.add('visible');
+        setTimeout(() => msg.classList.remove('visible'), 3000);
+      } catch { alert('File không hợp lệ.'); }
+      event.target.value = '';
+    };
+    reader.readAsText(file);
   }
 
   function toggleSavedReview(id, btn) {
