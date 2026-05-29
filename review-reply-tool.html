@@ -419,8 +419,10 @@
 
   <!-- Review Age Toggle -->
   <div class="toggle-row">
-    <button class="toggle-option active" id="toggleRecent" onclick="setReviewAge('recent')">Recent review</button>
-    <button class="toggle-option" id="toggleOld" onclick="setReviewAge('old')">Review từ lâu (4+ tháng)</button>
+    <button class="toggle-option active" id="toggleRecent" onclick="setReviewAge('recent')">Recent</button>
+    <button class="toggle-option" id="toggleWeek" onclick="setReviewAge('week')">~1 week ago</button>
+    <button class="toggle-option" id="toggleMonth" onclick="setReviewAge('month')">~1 month ago</button>
+    <button class="toggle-option" id="toggleYear" onclick="setReviewAge('year')">1 year+ ago</button>
   </div>
 
   <!-- Generate -->
@@ -600,8 +602,9 @@
 
   function setReviewAge(val) {
     reviewAge = val;
-    document.getElementById('toggleRecent').classList.toggle('active', val === 'recent');
-    document.getElementById('toggleOld').classList.toggle('active', val === 'old');
+    ['recent','week','month','year'].forEach(v => {
+      document.getElementById('toggle' + v.charAt(0).toUpperCase() + v.slice(1)).classList.toggle('active', v === val);
+    });
   }
 
   // ── Generate ────────────────────────────────────────────────────
@@ -672,7 +675,12 @@ Rules:
 - Write in natural, everyday British English${examples.length > 0 ? '\n- Match the voice from the examples — that\'s the tone we\'re going for' : ''}
 - End with exactly this on two separate lines: "Best," then on the next line "The Memoire Saigon Team"
 
-Note: this review was ${reviewAge === 'old' ? 'written a long time ago (4+ months). Acknowledge that you\'re sorry to see it only now, mention that things have improved since, and still invite them back.' : 'written recently. Reply as normal.'}
+Note: this review was written ${
+  reviewAge === 'recent' ? 'recently. Reply as normal.' :
+  reviewAge === 'week'   ? 'about a week ago. Reply normally but feel free to lightly acknowledge the slight delay in responding if relevant.' :
+  reviewAge === 'month'  ? 'about a month ago. Briefly acknowledge you\'re sorry for only seeing this now, then reply as usual.' :
+                           'over a year ago. Acknowledge the significant time that has passed, apologise for only seeing it now, mention that you\'ve been working hard on improvements since, and warmly invite them to give you another try.'
+}
 
 Customer review:
 """
