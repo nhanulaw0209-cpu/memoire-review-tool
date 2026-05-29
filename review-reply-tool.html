@@ -582,7 +582,7 @@ Rules:
 - Be specific: if they mention food, space, service — react to that exact thing. Don't give a generic reply that could fit any restaurant
 - Don't sound like a template. Avoid: "enjoyed your meal with us", "looking forward to welcoming you back", "thrilled", "delighted", "pleased to hear", "valued feedback", "rest assured", "do not hesitate", "we can't wait" — if it sounds like it came from a template, rewrite it
 - Positive review: keep it warm and real. A bit of personality or light humour is great
-- Negative review: apologise like a human, no corporate waffle, no excuses
+- Negative review: acknowledge how they felt, not what they said. Don't repeat their complaints back at them — it sounds defensive. Apologise genuinely in one sentence, show you care, keep it calm and dignified. The goal is to leave the reader feeling heard, not to explain or justify anything
 - Length: short review (1–2 sentences) → reply in 1–2 sentences only. Longer review → 3–4 sentences max
 - Write in natural, everyday British English${examples.length > 0 ? '\n- Match the voice from the examples — that\'s the tone we\'re going for' : ''}
 - End with exactly this on two separate lines: "Best," then on the next line "The Memoire Saigon Team"
@@ -618,7 +618,14 @@ Write the reply only. Nothing else.`;
       const reply = data.choices?.[0]?.message?.content;
       if (!reply) throw new Error('No reply generated. Please try again.');
 
-      const trimmedReply = reply.trim().replace(/^./, c => c.toUpperCase());
+      const trimmedReply = reply.trim()
+        .replace(/^./, c => c.toUpperCase())
+        .replace(/([.!?]\s+)([a-z])/g, (_, punct, letter) => punct + letter.toUpperCase())
+        .replace(/\bi\b/g, 'I')
+        .replace(/\bi'm\b/gi, "I'm")
+        .replace(/\bi'll\b/gi, "I'll")
+        .replace(/\bi've\b/gi, "I've")
+        .replace(/\bi'd\b/gi, "I'd");
       document.getElementById('replyOutput').value = trimmedReply;
       replyBox.classList.add('visible');
       replyBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
