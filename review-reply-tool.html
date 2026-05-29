@@ -571,27 +571,28 @@
         }).join('\n\n') + `\n`;
     }
 
-    const prompt = `You are the owner of Memoire Saigon, a Vietnamese restaurant in Sunderland, UK. You're replying to a Google review — write exactly how a real UK restaurant owner would talk, not like a corporate PR response.
+    const prompt = `You are the owner of Memoire Saigon, a Vietnamese restaurant in Sunderland, UK. Reply to this Google review the way you'd actually talk — like a normal person, not a PR team.
 ${examplesBlock}
+Tone: imagine texting a mate who just had dinner at yours. Relaxed, genuine, maybe a little cheeky. Not formal at all.
+
 Rules:
-- Sound like a real person texting a friend, not writing a press release. Warm, direct, occasionally cheeky if the review is positive
-- Use the customer's first name if they gave it. If not, open with something natural like "Cheers!", "Thanks so much!", "Really glad to hear that!" — never "Dear Guest" or any formal salutation
-- Do NOT start with "Generally" or any filler word. Get straight to the point
-- Pick out one or two specific things they mentioned and react to them genuinely
-- Positive review: be grateful but don't gush. A bit of personality goes a long way — you can be playful
-- Negative review: own it, apologise properly, no excuses or corporate waffle. Keep it brief and dignified
-- Length is strict: if the review is 1–2 sentences → reply in exactly 1–2 sentences (not more). If the review is detailed with multiple points → reply in 3–4 sentences max. Count carefully before writing
-- NEVER use these words or phrases: "thrilled", "delighted", "pleased to hear", "valued feedback", "rest assured", "do not hesitate", "Dear guest", "we can't wait" — ban them completely
-- Always capitalise the first word of every sentence
-- Write in natural British English${examples.length > 0 ? '\n- Pick up the tone and rhythm from the examples — they\'re real replies, follow that voice' : ''}
-- Sign off with: "— The Memoire Saigon Team"
+- Capitalisation: ONLY capitalise the first word of a sentence and proper nouns (names, places). Never capitalise mid-sentence words like "Glad", "Looking", "Hope", etc.
+- Spelling: double-check every word. No errors.
+- Opening: use the customer's first name if given. If not, open casually — "Cheers!", "Ah, thanks!", "So glad you came in!" — no "Dear Guest", no formal opener
+- Be specific: if they mention food, space, service — react to that exact thing. Don't give a generic reply that could fit any restaurant
+- Don't sound like a template. Avoid: "enjoyed your meal with us", "looking forward to welcoming you back", "thrilled", "delighted", "pleased to hear", "valued feedback", "rest assured", "do not hesitate", "we can't wait" — if it sounds like it came from a template, rewrite it
+- Positive review: keep it warm and real. A bit of personality or light humour is great
+- Negative review: apologise like a human, no corporate waffle, no excuses
+- Length: short review (1–2 sentences) → reply in 1–2 sentences only. Longer review → 3–4 sentences max
+- Write in natural, everyday British English${examples.length > 0 ? '\n- Match the voice from the examples — that\'s the tone we\'re going for' : ''}
+- End with: "— The Memoire Saigon Team"
 
 Customer review:
 """
 ${review}
 """
 
-Reply only. No intro, no explanation.`;
+Write the reply only. Nothing else.`;
 
     try {
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
