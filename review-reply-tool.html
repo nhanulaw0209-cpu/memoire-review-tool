@@ -105,7 +105,10 @@
       background: #faf7f4;
       border-bottom: 1px solid #e8e0d8;
       gap: 10px;
+      cursor: pointer;
+      user-select: none;
     }
+    .example-item-header:hover { background: #f5f0eb; }
 
     .example-num {
       font-size: 11px; font-weight: bold;
@@ -113,11 +116,21 @@
       text-transform: uppercase; white-space: nowrap;
     }
 
+    .example-toggle {
+      font-size: 11px; color: #bbb;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .example-item.open .example-toggle { color: #8b1a1a; }
+
     .example-preview {
       flex: 1; font-size: 12px; color: #aaa;
       font-style: italic; white-space: nowrap;
       overflow: hidden; text-overflow: ellipsis;
     }
+
+    .example-pair { display: none; padding: 12px 14px; flex-direction: column; gap: 10px; }
+    .example-item.open .example-pair { display: flex; }
 
     .btn-remove {
       background: none; border: none; cursor: pointer;
@@ -528,7 +541,7 @@
 </div>
 
 <script>
-  const STORAGE_KEY = 'memoiresaigon_examples_v6';
+  const STORAGE_KEY = 'memoiresaigon_examples_v7';
   const API_KEY_STORAGE = 'memoiresaigon_apikey';
   const SAVED_REPLIES_KEY = 'memoiresaigon_saved_replies_v1';
   const SHEETS_URL_KEY = 'memoiresaigon_sheets_url';
@@ -536,145 +549,145 @@
   const DEFAULT_EXAMPLES = [
     {
       review: `Amazing food, loved the pho! Will definitely be back.`,
-      reply: `That pho took all morning and I'm really glad it hit the spot. Thank you for coming in — it genuinely means a lot from this little corner of Saundersfoot.\n\n— Memoire`
+      reply: `That pho took all morning and I'm really glad it hit the spot. Thank you for coming in — it genuinely means a lot from this little corner of Saundersfoot.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Came for dinner with my partner last Friday, the beef brisket pho was stunning, rich and full of flavour. Spring rolls were crispy and fresh. Staff were attentive without being over the top and the atmosphere was lovely. One of the best meals we've had in Sunderland.`,
-      reply: `The brisket is a long, slow cook and it's always good to hear it was worth it. Thank you for taking the time to write this — you and your partner made our Friday.\n\nCome back whenever.\n\n— Memoire`
+      reply: `The brisket is a long, slow cook and it's always good to hear it was worth it. Thank you for taking the time to write this — you and your partner made our Friday.\n\nCome back whenever.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Waited over 45 minutes for food that arrived cold. Mentioned it to the staff and they didn't seem bothered at all. Really disappointed.`,
-      reply: `That's not the evening you deserved and I'm genuinely sorry we fell short. I appreciate you telling us — it matters to us.\n\n— Memoire`
+      reply: `That's not the evening you deserved and I'm genuinely sorry we fell short. I appreciate you telling us — it matters to us.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Food was okay but nothing special. Felt overpriced for what it was. Wouldn't rush back.`,
-      reply: `I hear you, and I appreciate the honesty. We're always working on it — I hope one day you'll give us another chance and feel the difference.\n\n— Memoire`
+      reply: `I hear you, and I appreciate the honesty. We're always working on it — I hope one day you'll give us another chance and feel the difference.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `We had a takeaway last night. Hot and sour soups were awful. A real MSG overload. The Singapore rice was poor. Tiny slivers of pork, prawns somehow looked deflated and were over cooked. Beef noodles, three small pieces of beef. The noodles were just an oily and greasy mess. I have never left a bad review before, but this was a terrible meal.`,
-      reply: `That's genuinely difficult to read, and I'm truly sorry — that wasn't good enough by any measure. If you're ever willing to give us another try, please reach out directly and I'll make sure it's a very different experience.\n\n— Memoire`
+      reply: `That's genuinely difficult to read, and I'm truly sorry — that wasn't good enough by any measure. If you're ever willing to give us another try, please reach out directly and I'll make sure it's a very different experience.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Visited a few months ago and have been meaning to write this. The food was disappointing across the board and not what we expected at all. Won't be returning.`,
-      reply: `I'm sorry I'm only seeing this now — and sorry it wasn't what you hoped for. A lot has moved on since then, and if you're ever in Saundersfoot again, I'd love for you to give us another chance.\n\n— Memoire`
+      reply: `I'm sorry I'm only seeing this now — and sorry it wasn't what you hoped for. A lot has moved on since then, and if you're ever in Saundersfoot again, I'd love for you to give us another chance.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     // ── Dine-in scenarios ──
     {
       review: `Amazing food and lovely atmosphere. Staff were so friendly and attentive. Will definitely be back!`,
-      reply: `Thank you so much — we're so glad you had a wonderful evening. Our team works hard to make every guest feel welcome, and your kind words mean a lot. We look forward to seeing you again soon!\n\n— Memoire`
+      reply: `Thank you so much — we're so glad you had a wonderful evening. Our team works hard to make every guest feel welcome, and your kind words mean a lot. We look forward to seeing you again soon!\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `The lamb shank was absolutely perfect. Tender, rich and beautifully presented.`,
-      reply: `That's wonderful to hear! The lamb shank is one of our kitchen's signature dishes — we'll be sure to pass your compliments to the chef. Hope to welcome you back soon for another great meal!\n\n— Memoire`
+      reply: `That's wonderful to hear! The lamb shank is one of our kitchen's signature dishes — we'll be sure to pass your compliments to the chef. Hope to welcome you back soon for another great meal!\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Celebrated our anniversary here and the staff went out of their way to make it special. Couldn't have asked for more.`,
-      reply: `Happy anniversary — it was truly our pleasure to be part of such a special occasion. Our team loves making moments like these memorable, and your kind words mean the world to us. We hope to celebrate many more milestones with you!\n\n— Memoire`
+      reply: `Happy anniversary — it was truly our pleasure to be part of such a special occasion. Our team loves making moments like these memorable, and your kind words mean the world to us. We hope to celebrate many more milestones with you!\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `The steak was overcooked and dry. For that price I expected much better.`,
-      reply: `We're truly sorry to hear this. That's not the standard we hold our kitchen to, and I've shared your feedback directly with our head chef. Please reach out to us — we'd like to invite you back and make this right.\n\n— Memoire`
+      reply: `We're truly sorry to hear this. That's not the standard we hold our kitchen to, and I've shared your feedback directly with our head chef. Please reach out to us — we'd like to invite you back and make this right.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `The salmon was overcooked and tasteless, very disappointing for the price.`,
-      reply: `We're truly sorry — that's not the standard we hold our kitchen to, and we understand how disappointing that must have been. Please reach out and we'd love to invite you back to get it right.\n\n— Memoire`
+      reply: `We're truly sorry — that's not the standard we hold our kitchen to, and we understand how disappointing that must have been. Please reach out and we'd love to invite you back to get it right.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Waited 55 minutes for mains. No one came to update us or apologise for the delay.`,
-      reply: `We sincerely apologise for the wait and the lack of communication from our team. Keeping guests informed during any delay is something our staff should always do, and we clearly fell short here. Please get in touch — we'd love to welcome you back.\n\n— Memoire`
+      reply: `We sincerely apologise for the wait and the lack of communication from our team. Keeping guests informed during any delay is something our staff should always do, and we clearly fell short here. Please get in touch — we'd love to welcome you back.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Waited over 45 minutes for starters. Staff seemed completely unaware we existed.`,
-      reply: `We sincerely apologise — that wait with no acknowledgement from our team is simply not acceptable. We've reviewed our floor management and are taking steps to make sure this doesn't happen again. Please contact us and we'd like to welcome you back.\n\n— Memoire`
+      reply: `We sincerely apologise — that wait with no acknowledgement from our team is simply not acceptable. We've reviewed our floor management and are taking steps to make sure this doesn't happen again. Please contact us and we'd like to welcome you back.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `The waiter was rude and dismissive when we asked for the bill. Ruined the whole evening.`,
-      reply: `We're deeply sorry to hear this. Every guest deserves to feel respected and valued, and this has been raised directly with our management team. Please reach out to us directly — we want to make this right.\n\n— Memoire`
+      reply: `We're deeply sorry to hear this. Every guest deserves to feel respected and valued, and this has been raised directly with our management team. Please reach out to us directly — we want to make this right.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Staff were dismissive and unhelpful when we flagged an issue with our order. Felt completely ignored.`,
-      reply: `We are deeply sorry. Every guest should feel heard, especially when raising a concern — and it's clear our team let you down. Please contact us directly so we can personally make this right.\n\n— Memoire`
+      reply: `We are deeply sorry. Every guest should feel heard, especially when raising a concern — and it's clear our team let you down. Please contact us directly so we can personally make this right.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Paid £22 for a pasta dish that was barely half a plate. Left still hungry.`,
-      reply: `Thank you for the honest feedback. We're sorry the portion didn't match expectations at that price — leaving a guest still hungry is never what we want. We're reviewing our portion standards and would appreciate the chance to speak with you directly.\n\n— Memoire`
+      reply: `Thank you for the honest feedback. We're sorry the portion didn't match expectations at that price — leaving a guest still hungry is never what we want. We're reviewing our portion standards and would appreciate the chance to speak with you directly.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Table hadn't been properly cleaned. Found dried food on the cutlery. Really put us off.`,
-      reply: `We are truly sorry — dirty cutlery and an unclean table are completely unacceptable and fall far below our standards. This has been raised immediately with our front-of-house team. Please contact us so we can make this up to you.\n\n— Memoire`
+      reply: `We are truly sorry — dirty cutlery and an unclean table are completely unacceptable and fall far below our standards. This has been raised immediately with our front-of-house team. Please contact us so we can make this up to you.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `So loud we couldn't hold a conversation. AC was freezing the whole time.`,
-      reply: `Thank you for the feedback. We're sorry the noise level and temperature affected your experience — a comfortable environment is just as important as the food. We're looking into this and would love to have you back once we've made improvements.\n\n— Memoire`
+      reply: `Thank you for the feedback. We're sorry the noise level and temperature affected your experience — a comfortable environment is just as important as the food. We're looking into this and would love to have you back once we've made improvements.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `(1 star, no written review)`,
-      reply: `Thank you for taking the time to leave a rating. We're sorry if your experience didn't meet expectations — we'd genuinely love to understand what went wrong so we can improve. Please reach out and we'll do our best to make it right.\n\n— Memoire`
+      reply: `Thank you for taking the time to leave a rating. We're sorry if your experience didn't meet expectations — we'd genuinely love to understand what went wrong so we can improve. Please reach out and we'll do our best to make it right.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Food was great but the service was really slow and we felt rushed at the end to leave.`,
-      reply: `Thank you for the kind words about the food — we're glad that hit the mark! We're sorry the service pace let the experience down. Guests should never feel rushed, and this is something we're actively addressing with our floor team. We'd love to welcome you back for the full experience.\n\n— Memoire`
+      reply: `Thank you for the kind words about the food — we're glad that hit the mark! We're sorry the service pace let the experience down. Guests should never feel rushed, and this is something we're actively addressing with our floor team. We'd love to welcome you back for the full experience.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Lovely staff and great atmosphere but the food was bland and overpriced for what it was.`,
-      reply: `Thank you — we're really pleased our team and atmosphere made a good impression! You're right to hold us to a higher standard on the food, and your feedback has been shared with our kitchen. We're always refining our menu and would love to have you back to try our latest dishes.\n\n— Memoire`
+      reply: `Thank you — we're really pleased our team and atmosphere made a good impression! You're right to hold us to a higher standard on the food, and your feedback has been shared with our kitchen. We're always refining our menu and would love to have you back to try our latest dishes.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     // ── Takeaway scenarios ──
     {
       review: `Best takeaway in the area! Food was piping hot, arrived on time and tasted incredible. Ordering again for sure.`,
-      reply: `Thank you so much — we're really glad everything arrived hot and on time. That's exactly what we aim for every order. We can't wait to cook for you again!\n\n— Memoire`
+      reply: `Thank you so much — we're really glad everything arrived hot and on time. That's exactly what we aim for every order. We can't wait to cook for you again!\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `The chicken tikka masala was absolutely spot on. Authentic flavours and generous portions. Will be our go-to from now on.`,
-      reply: `That's so great to hear! We'll be sure to pass your compliments to the kitchen. Looking forward to your next order!\n\n— Memoire`
+      reply: `That's so great to hear! We'll be sure to pass your compliments to the kitchen. Looking forward to your next order!\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Order arrived in under 30 minutes and everything was perfectly packed. Impressive!`,
-      reply: `Thank you — we take great pride in getting orders out quickly and packaged well. It's brilliant to hear it made a difference. See you next time!\n\n— Memoire`
+      reply: `Thank you — we take great pride in getting orders out quickly and packaged well. It's brilliant to hear it made a difference. See you next time!\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Ordered at 7pm, food didn't arrive until 9:15pm. No updates, no apology. Cold and inedible by the time it got here.`,
-      reply: `We are truly sorry — a two-hour wait with no communication and cold food on arrival is completely unacceptable. We've reviewed what happened and are adjusting our delivery scheduling. Please contact us and we'll arrange a full replacement order at no charge.\n\n— Memoire`
+      reply: `We are truly sorry — a two-hour wait with no communication and cold food on arrival is completely unacceptable. We've reviewed what happened and are adjusting our delivery scheduling. Please contact us and we'll arrange a full replacement order at no charge.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Completely wrong order delivered. Ordered chicken, got lamb. Two items missing entirely. Called twice, no answer.`,
-      reply: `We sincerely apologise — receiving the wrong items and being unable to reach us is a complete failure on our part. Please contact us directly with your order number and we will sort the correct order or a full refund immediately, whichever you prefer.\n\n— Memoire`
+      reply: `We sincerely apologise — receiving the wrong items and being unable to reach us is a complete failure on our part. Please contact us directly with your order number and we will sort the correct order or a full refund immediately, whichever you prefer.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Paid for 4 dishes, only 3 arrived. The naan bread and one side were missing. Very frustrating.`,
-      reply: `We're really sorry about the missing items — that's frustrating and completely our mistake. Please contact us with your order number and we'll get the missing items to you right away or issue a partial refund.\n\n— Memoire`
+      reply: `We're really sorry about the missing items — that's frustrating and completely our mistake. Please contact us with your order number and we'll get the missing items to you right away or issue a partial refund.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Chips were completely soggy and cold. Curry had leaked through the bag and made a mess. Packaging is terrible.`,
-      reply: `We're so sorry about this — soggy chips and a leaking bag completely ruin the experience. We've flagged the packaging issue and switched to sealed containers for all liquid dishes. Please contact us and we'll arrange a replacement order.\n\n— Memoire`
+      reply: `We're so sorry about this — soggy chips and a leaking bag completely ruin the experience. We've flagged the packaging issue and switched to sealed containers for all liquid dishes. Please contact us and we'll arrange a replacement order.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `The food tasted reheated and stale. Nothing like it used to be. Very disappointed.`,
-      reply: `We're truly sorry to hear this — that is not the standard we hold ourselves to. I've shared your feedback with our kitchen team. Please contact us and we'd like to offer you a freshly made replacement order.\n\n— Memoire`
+      reply: `We're truly sorry to hear this — that is not the standard we hold ourselves to. I've shared your feedback with our kitchen team. Please contact us and we'd like to offer you a freshly made replacement order.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Called to complain about my order, no one picked up. Sent an email three days ago, still no reply. Appalling customer service.`,
-      reply: `We are truly sorry — not following up after a complaint is completely unacceptable and we understand your frustration. Please contact us directly and we will personally respond and resolve this for you.\n\n— Memoire`
+      reply: `We are truly sorry — not following up after a complaint is completely unacceptable and we understand your frustration. Please contact us directly and we will personally respond and resolve this for you.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Spent £35 for two people and the portions were tiny. Felt really ripped off.`,
-      reply: `Thank you for the honest feedback. We're sorry the portions didn't match expectations at that price — we never want a customer to feel short-changed. We're reviewing our portion sizing. Please contact us so we can discuss this further.\n\n— Memoire`
+      reply: `Thank you for the honest feedback. We're sorry the portions didn't match expectations at that price — we never want a customer to feel short-changed. We're reviewing our portion sizing. Please contact us so we can discuss this further.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Order got cancelled 40 minutes after placing it with no explanation. Ruined our Friday night dinner plans.`,
-      reply: `We're really sorry about this — a last-minute cancellation with no explanation is completely unacceptable. Please contact us and we'll arrange a priority order at a discounted rate to make up for it.\n\n— Memoire`
+      reply: `We're really sorry about this — a last-minute cancellation with no explanation is completely unacceptable. Please contact us and we'll arrange a priority order at a discounted rate to make up for it.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Found a hair in my food. Absolutely disgusting. Will never order again.`,
-      reply: `We are deeply sorry — finding anything foreign in your food is completely unacceptable and we take this extremely seriously. This has been raised immediately with our kitchen team and a full hygiene review is underway. Please contact us directly for a full refund.\n\n— Memoire`
+      reply: `We are deeply sorry — finding anything foreign in your food is completely unacceptable and we take this extremely seriously. This has been raised immediately with our kitchen team and a full hygiene review is underway. Please contact us directly for a full refund.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Food itself was delicious when it finally arrived, but the wait was nearly 90 minutes with no updates at all.`,
-      reply: `Thank you for the kind words about the food — we're really glad it was worth it, even if the wait itself was far too long. A 90-minute delivery with no communication is not acceptable, and we're actively working on our dispatch process. Please contact us and we'd like to offer you a discount on your next order.\n\n— Memoire`
+      reply: `Thank you for the kind words about the food — we're really glad it was worth it, even if the wait itself was far too long. A 90-minute delivery with no communication is not acceptable, and we're actively working on our dispatch process. Please contact us and we'd like to offer you a discount on your next order.\\n\\nBest,\\nThe Memoire Saigon Team`
     },
     {
       review: `Arrived super fast and everything was hot, but the biryani was way too salty and the portion of rice was small.`,
-      reply: `Really glad the delivery was quick and everything arrived hot! You're right to flag the seasoning though — consistency is something our kitchen takes seriously and we'll be reviewing this directly with the chef. Please contact us and we'd love to send you a replacement.\n\n— Memoire`
+      reply: `Really glad the delivery was quick and everything arrived hot! You're right to flag the seasoning though — consistency is something our kitchen takes seriously and we'll be reviewing this directly with the chef. Please contact us and we'd love to send you a replacement.\\n\\nBest,\\nThe Memoire Saigon Team`
     }
   ];
 
@@ -807,11 +820,16 @@
       const preview = pair.reply ? pair.reply.substring(0, 55) + (pair.reply.length > 55 ? '…' : '') : 'Empty';
       const item = document.createElement('div');
       item.className = 'example-item';
+      const reviewPreview = pair.review ? pair.review.substring(0, 40) + (pair.review.length > 40 ? '…' : '') : '';
+      const replyPreview  = pair.reply  ? pair.reply.substring(0, 45)  + (pair.reply.length  > 45  ? '…' : '') : 'Empty';
+      const combinedPreview = reviewPreview ? `${escHtml(reviewPreview)} → ${escHtml(replyPreview)}` : escHtml(replyPreview);
+
       item.innerHTML = `
-        <div class="example-item-header">
+        <div class="example-item-header" onclick="toggleExample(${i})">
           <span class="example-num">Example ${i + 1}</span>
-          <span class="example-preview" id="preview-${i}">${escHtml(preview)}</span>
-          <button class="btn-remove" onclick="removeExample(${i})" title="Remove">×</button>
+          <span class="example-preview" id="preview-${i}">${combinedPreview}</span>
+          <span class="example-toggle">▶</span>
+          <button class="btn-remove" onclick="event.stopPropagation();removeExample(${i})" title="Remove">×</button>
         </div>
         <div class="example-pair">
           <div class="pair-half review">
@@ -837,13 +855,28 @@
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  function toggleExample(i) {
+    const items = document.querySelectorAll('.example-item');
+    if (items[i]) {
+      const isOpen = items[i].classList.toggle('open');
+      const arrow = items[i].querySelector('.example-toggle');
+      if (arrow) arrow.textContent = isOpen ? '▼' : '▶';
+    }
+  }
+
   function addExample() {
     const examples = loadExamples();
     examples.push({ review: '', reply: '' });
     saveExamples(examples);
     renderExamples();
     const items = document.querySelectorAll('.example-item');
-    if (items.length) items[items.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (items.length) {
+      const last = items[items.length - 1];
+      last.classList.add('open');
+      const arrow = last.querySelector('.example-toggle');
+      if (arrow) arrow.textContent = '▼';
+      last.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
   function removeExample(index) {
@@ -938,7 +971,7 @@ Rules:
 - Never use: "thrilled", "delighted", "pleased to hear", "looking forward to welcoming you back", "enjoyed your meal with us", "we can't wait".
 - Length: short review → 2–3 sentences. Longer or detailed review → up to 4 sentences. Never pad.
 - Write in warm, natural, everyday British English.${examples.length > 0 ? '\n- Study the examples closely — that voice, that balance of personality and warmth, is exactly what to match.' : ''}
-- End with exactly this on its own line: "— Memoire"
+- End with exactly this on two separate lines: "Best," then on the next line "The Memoire Saigon Team"
 
 Note: this review was written ${
   reviewAge === 'recent' ? 'recently. Reply as normal.' :
