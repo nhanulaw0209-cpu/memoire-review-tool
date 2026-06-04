@@ -392,6 +392,26 @@
     <p>Google Review Reply Generator</p>
   </header>
 
+  <!-- Restaurant Info -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header">
+      <span class="section-label">Restaurant Info</span>
+      <button class="collapse-btn" onclick="toggleSection('infoBody', this)">Hide ▲</button>
+    </div>
+    <div id="infoBody" style="display:flex;flex-wrap:wrap;gap:18px;font-size:14px;color:#555;line-height:1.7">
+      <div style="flex:1;min-width:200px">
+        <div style="margin-bottom:6px"><span style="font-weight:bold;color:#8b1a1a">📍</span> 2 Brewery Terrace, Saundersfoot SA69 9HG, Wales, UK</div>
+        <div style="margin-bottom:6px"><span style="font-weight:bold;color:#8b1a1a">📞</span> +44 7415 726148</div>
+        <div style="margin-bottom:6px"><span style="font-weight:bold;color:#8b1a1a">🕐</span> Dine-in opens 12 PM · Takeout 4 PM–9 PM</div>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <div style="margin-bottom:6px"><span style="font-weight:bold;color:#8b1a1a">💷</span> £20–30 per person</div>
+        <div style="margin-bottom:6px"><span style="font-weight:bold;color:#8b1a1a">⭐</span> 4.9 · 147 Google reviews</div>
+        <div style="margin-bottom:6px"><span style="font-weight:bold;color:#8b1a1a">🌊</span> Small indoor Vietnamese restaurant · Saundersfoot Harbour</div>
+      </div>
+    </div>
+  </div>
+
   <!-- API Key -->
   <div class="card">
     <div class="card-header">
@@ -413,6 +433,27 @@
         </select>
       </div>
       <p class="hint">Lấy key miễn phí tại console.groq.com/keys — Key lưu trong browser, không gửi đi đâu ngoài Groq.</p>
+    </div>
+  </div>
+
+  <!-- Google Sheets Sync -->
+  <div class="card">
+    <div class="card-header">
+      <span class="section-label">Google Sheets Sync</span>
+      <button class="collapse-btn" onclick="toggleSection('sheetsBody', this)">Hide ▲</button>
+    </div>
+    <div id="sheetsBody">
+      <label>Apps Script Web App URL</label>
+      <div class="api-row">
+        <input type="text" id="sheetsUrl" placeholder="https://script.google.com/macros/s/.../exec" style="font-family:monospace;font-size:12px" />
+      </div>
+      <p class="hint" style="margin-top:8px">Paste URL sau khi deploy Apps Script trên Google. URL lưu trong browser.</p>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="btn-export" onclick="syncFromSheets()" id="syncBtn">↓ Sync từ Sheets</button>
+        <button class="btn-export" onclick="pushAllToSheets()" id="pushAllBtn">↑ Push tất cả lên Sheets</button>
+        <span id="syncMsg" style="font-size:12px;color:#2ecc71;display:none"></span>
+        <span id="syncErr" style="font-size:12px;color:#c0392b;display:none"></span>
+      </div>
     </div>
   </div>
 
@@ -483,38 +524,157 @@
     </div>
   </div>
 
-  <footer>Memoire Saigon · Sunderland, UK</footer>
+  <footer>Memoire Saigon · 2 Brewery Terrace, Saundersfoot, Wales</footer>
 </div>
 
 <script>
-  const STORAGE_KEY = 'memoiresaigon_examples_v4';
+  const STORAGE_KEY = 'memoiresaigon_examples_v6';
   const API_KEY_STORAGE = 'memoiresaigon_apikey';
   const SAVED_REPLIES_KEY = 'memoiresaigon_saved_replies_v1';
+  const SHEETS_URL_KEY = 'memoiresaigon_sheets_url';
 
   const DEFAULT_EXAMPLES = [
     {
       review: `Amazing food, loved the pho! Will definitely be back.`,
-      reply: `Cheers! The pho is one of our favourites to make, really glad it hit the spot. See you next time!\n\nBest,\nThe Memoire Saigon Team`
+      reply: `That pho took all morning and I'm really glad it hit the spot. Thank you for coming in — it genuinely means a lot from this little corner of Saundersfoot.\n\n— Memoire`
     },
     {
       review: `Came for dinner with my partner last Friday, the beef brisket pho was stunning, rich and full of flavour. Spring rolls were crispy and fresh. Staff were attentive without being over the top and the atmosphere was lovely. One of the best meals we've had in Sunderland.`,
-      reply: `So glad it all came together for you. The brisket pho takes a lot of work so it's great to hear it lands well. We hope to see you both back soon!\n\nBest,\nThe Memoire Saigon Team`
+      reply: `The brisket is a long, slow cook and it's always good to hear it was worth it. Thank you for taking the time to write this — you and your partner made our Friday.\n\nCome back whenever.\n\n— Memoire`
     },
     {
       review: `Waited over 45 minutes for food that arrived cold. Mentioned it to the staff and they didn't seem bothered at all. Really disappointed.`,
-      reply: `That's not the evening you deserved and I'm sorry we let you down. You deserved better from us, thank you for telling us.\n\nBest,\nThe Memoire Saigon Team`
+      reply: `That's not the evening you deserved and I'm genuinely sorry we fell short. I appreciate you telling us — it matters to us.\n\n— Memoire`
     },
     {
       review: `Food was okay but nothing special. Felt overpriced for what it was. Wouldn't rush back.`,
-      reply: `Sorry to hear it didn't quite land for you and we'll keep working on it. We'd love a chance to change your mind if you're ever up for giving us another go.\n\nBest,\nThe Memoire Saigon Team`
+      reply: `I hear you, and I appreciate the honesty. We're always working on it — I hope one day you'll give us another chance and feel the difference.\n\n— Memoire`
     },
     {
       review: `We had a takeaway last night. Hot and sour soups were awful. A real MSG overload. The Singapore rice was poor. Tiny slivers of pork, prawns somehow looked deflated and were over cooked. Beef noodles, three small pieces of beef. The noodles were just an oily and greasy mess. I have never left a bad review before, but this was a terrible meal.`,
-      reply: `I'm really sorry, that's not the standard we hold ourselves to and reading this is hard. If you're open to it, please get in touch with us directly and we'll do what we can to put it right.\n\nBest,\nThe Memoire Saigon Team`
+      reply: `That's genuinely difficult to read, and I'm truly sorry — that wasn't good enough by any measure. If you're ever willing to give us another try, please reach out directly and I'll make sure it's a very different experience.\n\n— Memoire`
     },
     {
       review: `Visited a few months ago and have been meaning to write this. The food was disappointing across the board and not what we expected at all. Won't be returning.`,
-      reply: `I'm sorry to see this now, that's not the experience you should have had and I wish we'd had the chance to put it right at the time. We've been working hard on our standards since then and hope you might give us another chance one day.\n\nBest,\nThe Memoire Saigon Team`
+      reply: `I'm sorry I'm only seeing this now — and sorry it wasn't what you hoped for. A lot has moved on since then, and if you're ever in Saundersfoot again, I'd love for you to give us another chance.\n\n— Memoire`
+    },
+    // ── Dine-in scenarios ──
+    {
+      review: `Amazing food and lovely atmosphere. Staff were so friendly and attentive. Will definitely be back!`,
+      reply: `Thank you so much — we're so glad you had a wonderful evening. Our team works hard to make every guest feel welcome, and your kind words mean a lot. We look forward to seeing you again soon!\n\n— Memoire`
+    },
+    {
+      review: `The lamb shank was absolutely perfect. Tender, rich and beautifully presented.`,
+      reply: `That's wonderful to hear! The lamb shank is one of our kitchen's signature dishes — we'll be sure to pass your compliments to the chef. Hope to welcome you back soon for another great meal!\n\n— Memoire`
+    },
+    {
+      review: `Celebrated our anniversary here and the staff went out of their way to make it special. Couldn't have asked for more.`,
+      reply: `Happy anniversary — it was truly our pleasure to be part of such a special occasion. Our team loves making moments like these memorable, and your kind words mean the world to us. We hope to celebrate many more milestones with you!\n\n— Memoire`
+    },
+    {
+      review: `The steak was overcooked and dry. For that price I expected much better.`,
+      reply: `We're truly sorry to hear this. That's not the standard we hold our kitchen to, and I've shared your feedback directly with our head chef. Please reach out to us — we'd like to invite you back and make this right.\n\n— Memoire`
+    },
+    {
+      review: `The salmon was overcooked and tasteless, very disappointing for the price.`,
+      reply: `We're truly sorry — that's not the standard we hold our kitchen to, and we understand how disappointing that must have been. Please reach out and we'd love to invite you back to get it right.\n\n— Memoire`
+    },
+    {
+      review: `Waited 55 minutes for mains. No one came to update us or apologise for the delay.`,
+      reply: `We sincerely apologise for the wait and the lack of communication from our team. Keeping guests informed during any delay is something our staff should always do, and we clearly fell short here. Please get in touch — we'd love to welcome you back.\n\n— Memoire`
+    },
+    {
+      review: `Waited over 45 minutes for starters. Staff seemed completely unaware we existed.`,
+      reply: `We sincerely apologise — that wait with no acknowledgement from our team is simply not acceptable. We've reviewed our floor management and are taking steps to make sure this doesn't happen again. Please contact us and we'd like to welcome you back.\n\n— Memoire`
+    },
+    {
+      review: `The waiter was rude and dismissive when we asked for the bill. Ruined the whole evening.`,
+      reply: `We're deeply sorry to hear this. Every guest deserves to feel respected and valued, and this has been raised directly with our management team. Please reach out to us directly — we want to make this right.\n\n— Memoire`
+    },
+    {
+      review: `Staff were dismissive and unhelpful when we flagged an issue with our order. Felt completely ignored.`,
+      reply: `We are deeply sorry. Every guest should feel heard, especially when raising a concern — and it's clear our team let you down. Please contact us directly so we can personally make this right.\n\n— Memoire`
+    },
+    {
+      review: `Paid £22 for a pasta dish that was barely half a plate. Left still hungry.`,
+      reply: `Thank you for the honest feedback. We're sorry the portion didn't match expectations at that price — leaving a guest still hungry is never what we want. We're reviewing our portion standards and would appreciate the chance to speak with you directly.\n\n— Memoire`
+    },
+    {
+      review: `Table hadn't been properly cleaned. Found dried food on the cutlery. Really put us off.`,
+      reply: `We are truly sorry — dirty cutlery and an unclean table are completely unacceptable and fall far below our standards. This has been raised immediately with our front-of-house team. Please contact us so we can make this up to you.\n\n— Memoire`
+    },
+    {
+      review: `So loud we couldn't hold a conversation. AC was freezing the whole time.`,
+      reply: `Thank you for the feedback. We're sorry the noise level and temperature affected your experience — a comfortable environment is just as important as the food. We're looking into this and would love to have you back once we've made improvements.\n\n— Memoire`
+    },
+    {
+      review: `(1 star, no written review)`,
+      reply: `Thank you for taking the time to leave a rating. We're sorry if your experience didn't meet expectations — we'd genuinely love to understand what went wrong so we can improve. Please reach out and we'll do our best to make it right.\n\n— Memoire`
+    },
+    {
+      review: `Food was great but the service was really slow and we felt rushed at the end to leave.`,
+      reply: `Thank you for the kind words about the food — we're glad that hit the mark! We're sorry the service pace let the experience down. Guests should never feel rushed, and this is something we're actively addressing with our floor team. We'd love to welcome you back for the full experience.\n\n— Memoire`
+    },
+    {
+      review: `Lovely staff and great atmosphere but the food was bland and overpriced for what it was.`,
+      reply: `Thank you — we're really pleased our team and atmosphere made a good impression! You're right to hold us to a higher standard on the food, and your feedback has been shared with our kitchen. We're always refining our menu and would love to have you back to try our latest dishes.\n\n— Memoire`
+    },
+    // ── Takeaway scenarios ──
+    {
+      review: `Best takeaway in the area! Food was piping hot, arrived on time and tasted incredible. Ordering again for sure.`,
+      reply: `Thank you so much — we're really glad everything arrived hot and on time. That's exactly what we aim for every order. We can't wait to cook for you again!\n\n— Memoire`
+    },
+    {
+      review: `The chicken tikka masala was absolutely spot on. Authentic flavours and generous portions. Will be our go-to from now on.`,
+      reply: `That's so great to hear! We'll be sure to pass your compliments to the kitchen. Looking forward to your next order!\n\n— Memoire`
+    },
+    {
+      review: `Order arrived in under 30 minutes and everything was perfectly packed. Impressive!`,
+      reply: `Thank you — we take great pride in getting orders out quickly and packaged well. It's brilliant to hear it made a difference. See you next time!\n\n— Memoire`
+    },
+    {
+      review: `Ordered at 7pm, food didn't arrive until 9:15pm. No updates, no apology. Cold and inedible by the time it got here.`,
+      reply: `We are truly sorry — a two-hour wait with no communication and cold food on arrival is completely unacceptable. We've reviewed what happened and are adjusting our delivery scheduling. Please contact us and we'll arrange a full replacement order at no charge.\n\n— Memoire`
+    },
+    {
+      review: `Completely wrong order delivered. Ordered chicken, got lamb. Two items missing entirely. Called twice, no answer.`,
+      reply: `We sincerely apologise — receiving the wrong items and being unable to reach us is a complete failure on our part. Please contact us directly with your order number and we will sort the correct order or a full refund immediately, whichever you prefer.\n\n— Memoire`
+    },
+    {
+      review: `Paid for 4 dishes, only 3 arrived. The naan bread and one side were missing. Very frustrating.`,
+      reply: `We're really sorry about the missing items — that's frustrating and completely our mistake. Please contact us with your order number and we'll get the missing items to you right away or issue a partial refund.\n\n— Memoire`
+    },
+    {
+      review: `Chips were completely soggy and cold. Curry had leaked through the bag and made a mess. Packaging is terrible.`,
+      reply: `We're so sorry about this — soggy chips and a leaking bag completely ruin the experience. We've flagged the packaging issue and switched to sealed containers for all liquid dishes. Please contact us and we'll arrange a replacement order.\n\n— Memoire`
+    },
+    {
+      review: `The food tasted reheated and stale. Nothing like it used to be. Very disappointed.`,
+      reply: `We're truly sorry to hear this — that is not the standard we hold ourselves to. I've shared your feedback with our kitchen team. Please contact us and we'd like to offer you a freshly made replacement order.\n\n— Memoire`
+    },
+    {
+      review: `Called to complain about my order, no one picked up. Sent an email three days ago, still no reply. Appalling customer service.`,
+      reply: `We are truly sorry — not following up after a complaint is completely unacceptable and we understand your frustration. Please contact us directly and we will personally respond and resolve this for you.\n\n— Memoire`
+    },
+    {
+      review: `Spent £35 for two people and the portions were tiny. Felt really ripped off.`,
+      reply: `Thank you for the honest feedback. We're sorry the portions didn't match expectations at that price — we never want a customer to feel short-changed. We're reviewing our portion sizing. Please contact us so we can discuss this further.\n\n— Memoire`
+    },
+    {
+      review: `Order got cancelled 40 minutes after placing it with no explanation. Ruined our Friday night dinner plans.`,
+      reply: `We're really sorry about this — a last-minute cancellation with no explanation is completely unacceptable. Please contact us and we'll arrange a priority order at a discounted rate to make up for it.\n\n— Memoire`
+    },
+    {
+      review: `Found a hair in my food. Absolutely disgusting. Will never order again.`,
+      reply: `We are deeply sorry — finding anything foreign in your food is completely unacceptable and we take this extremely seriously. This has been raised immediately with our kitchen team and a full hygiene review is underway. Please contact us directly for a full refund.\n\n— Memoire`
+    },
+    {
+      review: `Food itself was delicious when it finally arrived, but the wait was nearly 90 minutes with no updates at all.`,
+      reply: `Thank you for the kind words about the food — we're really glad it was worth it, even if the wait itself was far too long. A 90-minute delivery with no communication is not acceptable, and we're actively working on our dispatch process. Please contact us and we'd like to offer you a discount on your next order.\n\n— Memoire`
+    },
+    {
+      review: `Arrived super fast and everything was hot, but the biryani was way too salty and the portion of rice was small.`,
+      reply: `Really glad the delivery was quick and everything arrived hot! You're right to flag the seasoning though — consistency is something our kitchen takes seriously and we'll be reviewing this directly with the chef. Please contact us and we'd love to send you a replacement.\n\n— Memoire`
     }
   ];
 
@@ -528,6 +688,91 @@
   apiKeyInput.addEventListener('input', () => {
     localStorage.setItem(API_KEY_STORAGE, apiKeyInput.value.trim());
   });
+
+  // ── Google Sheets Sync ──────────────────────────────────────────
+  const sheetsUrlInput = document.getElementById('sheetsUrl');
+  sheetsUrlInput.value = localStorage.getItem(SHEETS_URL_KEY) || '';
+  sheetsUrlInput.addEventListener('input', () => {
+    localStorage.setItem(SHEETS_URL_KEY, sheetsUrlInput.value.trim());
+  });
+
+  function getSheetsUrl() { return localStorage.getItem(SHEETS_URL_KEY) || ''; }
+
+  async function pushToSheets(action, payload) {
+    const url = getSheetsUrl();
+    if (!url) return;
+    try {
+      await fetch(url, {
+        method: 'POST',
+        redirect: 'follow',
+        body: JSON.stringify({ action, ...payload })
+      });
+    } catch(e) { /* silent — localStorage là source of truth */ }
+  }
+
+  const sheetsEditDebounce = {};
+  function debouncedSheetUpdate(id, value) {
+    clearTimeout(sheetsEditDebounce[id]);
+    sheetsEditDebounce[id] = setTimeout(() => pushToSheets('update', { id, reply: value }), 2000);
+  }
+
+  async function syncFromSheets() {
+    const url = getSheetsUrl();
+    const btn = document.getElementById('syncBtn');
+    const msg = document.getElementById('syncMsg');
+    const err = document.getElementById('syncErr');
+    msg.style.display = 'none'; err.style.display = 'none';
+    if (!url) { err.textContent = 'Chưa nhập URL'; err.style.display = 'inline'; return; }
+    btn.disabled = true; btn.textContent = 'Đang sync...';
+    try {
+      const res = await fetch(url, { redirect: 'follow' });
+      const remote = await res.json();
+      const local = loadSavedReplies();
+      const localIds = new Set(local.map(r => r.id));
+      let added = 0;
+      remote.forEach(item => {
+        if (!localIds.has(item.id)) { local.push(item); added++; }
+        else {
+          const found = local.find(r => r.id === item.id);
+          if (found) found.status = item.status;
+        }
+      });
+      local.sort((a, b) => b.id - a.id);
+      localStorage.setItem(SAVED_REPLIES_KEY, JSON.stringify(local));
+      renderSavedReplies();
+      msg.textContent = added > 0 ? `✓ Đã thêm ${added} reply mới từ Sheets` : '✓ Đã cập nhật';
+      msg.style.display = 'inline';
+      setTimeout(() => msg.style.display = 'none', 4000);
+    } catch(e) {
+      err.textContent = `Lỗi kết nối: ${e.message}`;
+      err.style.display = 'inline';
+      setTimeout(() => err.style.display = 'none', 5000);
+    } finally { btn.disabled = false; btn.textContent = '↓ Sync từ Sheets'; }
+  }
+
+  async function pushAllToSheets() {
+    const url = getSheetsUrl();
+    const btn = document.getElementById('pushAllBtn');
+    const msg = document.getElementById('syncMsg');
+    const err = document.getElementById('syncErr');
+    msg.style.display = 'none'; err.style.display = 'none';
+    if (!url) { err.textContent = 'Chưa nhập URL'; err.style.display = 'inline'; return; }
+    btn.disabled = true; btn.textContent = 'Đang push...';
+    try {
+      const items = loadSavedReplies();
+      await fetch(url, {
+        method: 'POST', redirect: 'follow',
+        body: JSON.stringify({ action: 'bulkSave', items })
+      });
+      msg.textContent = `✓ Đã push ${items.length} replies lên Sheets`;
+      msg.style.display = 'inline';
+      setTimeout(() => msg.style.display = 'none', 4000);
+    } catch(e) {
+      err.textContent = `Lỗi: ${e.message}`;
+      err.style.display = 'inline';
+      setTimeout(() => err.style.display = 'none', 5000);
+    } finally { btn.disabled = false; btn.textContent = '↑ Push tất cả lên Sheets'; }
+  }
 
   function toggleKey() {
     apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
@@ -671,41 +916,35 @@
         }).join('\n\n') + `\n`;
     }
 
-    const prompt = `You are the owner of Memoire Saigon, a Vietnamese restaurant in Sunderland, UK. Reply to this Google review the way you'd actually talk — like a normal person, not a PR team.
+    const prompt = `You are the owner of Memoire Saigon — a small, cosy indoor Vietnamese restaurant at 2 Brewery Terrace, Saundersfoot, Pembrokeshire, Wales. Saundersfoot is a quiet, beautiful harbour village on the Welsh coast. You run this place yourself, hands-on, dine-in from 12 PM and takeout 4–9 PM, £20–30 per person, rated 4.9 stars on Google. You put real soul into the food and you genuinely care about the people who walk through the door.
+
+Your character: free-spirited, unconventional, a strong and distinctive voice — but also warm, sincere, and deeply appreciative of your guests. You're not a PR team and you don't sound like one. You're a real person who happens to run a restaurant they love. You speak with personality and with heart. Guests reading your reply should come away liking you — feeling respected, seen, and welcome.
 ${examplesBlock}
-Tone: imagine texting a mate who just had dinner at yours. Relaxed, genuine, maybe a little cheeky. Not formal at all.
+Tone: a chef-owner who is proud, genuine, a little unconventional — but always gracious. Warm without being gushing. Personal without oversharing. Polite without being stiff. Every reply should leave the reader with a good feeling about the place.
 
 Rules:
-- Capitalisation: ONLY capitalise the first word of a sentence and proper nouns (names, places). Never capitalise mid-sentence words like "Glad", "Looking", "Hope", etc.
-- Spelling: double-check every word. No errors.
-- Opening: use the customer's first name if given. If not, open casually — "Cheers!", "Ah, thanks!", "So glad you came in!" — no "Dear Guest", no formal opener
-- Be specific: if they mention food, space, service — react to that exact thing. Don't give a generic reply that could fit any restaurant
-- Don't sound like a template. Avoid: "enjoyed your meal with us", "looking forward to welcoming you back", "thrilled", "delighted", "genuinely", "pleased to hear", "valued feedback", "rest assured", "do not hesitate", "we can't wait" — if it sounds like it came from a template, rewrite it
-- Positive review: keep it warm and real. A bit of personality or light humour is great
-- Negative review: STRICT RULES — read carefully:
-  1. Maximum 2 sentences before the sign-off. Not 3. Not 4. Two.
-  2. Do NOT repeat any specific detail from the review (no food names, no "rude staff", no "cold food", nothing). Just acknowledge the feeling.
-  3. Apologise once. Not twice. Not three times.
-  4. End with something forward-looking — invite them back or thank them briefly.
-  5. BANNED phrases for negative replies: "take your feedback on board", "do better in the future", "I'm also", "I'm really disappointed to hear", "that's not the kind of service we aim to provide", "not the experience we want for our customers"
-
-  Copy this structure exactly:
-  Sentence 1: empathy — acknowledge they had a bad time, without naming what went wrong.
-  Sentence 2: apology + one small forward-looking line.
-
-  Good examples — write like these:
-  "That's not the evening you deserved at all, and I'm really sorry we let you down. We'd love a chance to make it right if you ever give us another try."
-  "So sorry it went that way, that's not good enough and I completely get your frustration. You deserved better from us."
-  "That sounds like a really disappointing visit, and I'm sorry. We'd love a chance to make it right."
-- Length: short review (1–2 sentences) → reply in 1–2 sentences only. Longer review → 3–4 sentences max
-- Write in natural, everyday British English${examples.length > 0 ? '\n- Match the voice from the examples — that\'s the tone we\'re going for' : ''}
-- End with exactly this on two separate lines: "Best," then on the next line "The Memoire Saigon Team"
+- Capitalisation: only the first word of a sentence and proper nouns. Never mid-sentence.
+- Spelling: exact. No errors.
+- No formal opener ("Dear Guest", "Hi there") — start naturally, the way a real person would write.
+- Be specific: if they mention a dish, a moment, an atmosphere — respond to that exact thing. Never write something that could belong to any restaurant.
+- Show genuine appreciation for the customer taking time to visit and/or write. It doesn't have to be explicit, but it should be felt.
+- Positive review: warm and real. Acknowledge something specific they mentioned. A touch of personality is welcome — a quiet observation, a bit of character. End with a sincere, natural invitation back (not "we look forward to welcoming you").
+- Negative review — follow carefully:
+  1. 2–3 sentences before the sign-off. No more.
+  2. Don't repeat their specifics (no food names, no incident details). Acknowledge how they felt.
+  3. One genuine apology — sincere, not self-flagellating.
+  4. End with a forward-looking line: invite them back, or offer to make it right — warmly, not defensively.
+  5. Banned phrases: "take your feedback on board", "rest assured", "not the experience we aim for", "valued feedback", "do better in the future", "that's not the kind of service we aim to provide".
+- Never use: "thrilled", "delighted", "pleased to hear", "looking forward to welcoming you back", "enjoyed your meal with us", "we can't wait".
+- Length: short review → 2–3 sentences. Longer or detailed review → up to 4 sentences. Never pad.
+- Write in warm, natural, everyday British English.${examples.length > 0 ? '\n- Study the examples closely — that voice, that balance of personality and warmth, is exactly what to match.' : ''}
+- End with exactly this on its own line: "— Memoire"
 
 Note: this review was written ${
   reviewAge === 'recent' ? 'recently. Reply as normal.' :
-  reviewAge === 'week'   ? 'about a week ago. Reply normally but feel free to lightly acknowledge the slight delay in responding if relevant.' :
-  reviewAge === 'month'  ? 'about a month ago. Briefly acknowledge you\'re sorry for only seeing this now, then reply as usual.' :
-                           'over a year ago. Acknowledge the significant time that has passed, apologise for only seeing it now, mention that you\'ve been working hard on improvements since, and warmly invite them to give you another try.'
+  reviewAge === 'week'   ? 'about a week ago. You can lightly and warmly acknowledge the slight delay if it feels natural.' :
+  reviewAge === 'month'  ? 'about a month ago. Briefly and genuinely acknowledge you\'re late seeing it, then reply as usual.' :
+                           'over a year ago. Acknowledge the time honestly and warmly. Mention things have moved on. Invite them back sincerely.'
 }
 
 Customer review:
@@ -776,20 +1015,27 @@ Write the reply only. Nothing else.`;
 
   function saveReply(review, reply) {
     const saved = loadSavedReplies();
-    saved.unshift({ id: Date.now(), review, reply, date: new Date().toLocaleString('vi-VN'), status: 'draft' });
+    const item = { id: Date.now(), review, reply, date: new Date().toLocaleString('vi-VN'), status: 'draft' };
+    saved.unshift(item);
     localStorage.setItem(SAVED_REPLIES_KEY, JSON.stringify(saved));
+    pushToSheets('save', item);
   }
 
   function deleteSavedReply(id) {
     const saved = loadSavedReplies().filter(r => r.id !== id);
     localStorage.setItem(SAVED_REPLIES_KEY, JSON.stringify(saved));
     renderSavedReplies();
+    pushToSheets('delete', { id });
   }
 
   function updateSavedReply(id, value) {
     const saved = loadSavedReplies();
     const item = saved.find(r => r.id === id);
-    if (item) { item.reply = value; localStorage.setItem(SAVED_REPLIES_KEY, JSON.stringify(saved)); }
+    if (item) {
+      item.reply = value;
+      localStorage.setItem(SAVED_REPLIES_KEY, JSON.stringify(saved));
+      debouncedSheetUpdate(id, value);
+    }
   }
 
   function toggleStatus(id) {
@@ -799,6 +1045,7 @@ Write the reply only. Nothing else.`;
       item.status = item.status === 'pass' ? 'draft' : 'pass';
       localStorage.setItem(SAVED_REPLIES_KEY, JSON.stringify(saved));
       renderSavedReplies();
+      pushToSheets('update', { id, status: item.status });
     }
   }
 
