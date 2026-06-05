@@ -472,9 +472,9 @@
   <div class="card">
     <div class="card-header">
       <span class="section-label">Training Examples</span>
-      <button class="collapse-btn" onclick="toggleSection('examplesBody', this)">Hide ▲</button>
+      <button class="collapse-btn" onclick="toggleSection('examplesBody', this)">Show ▼</button>
     </div>
-    <div id="examplesBody">
+    <div id="examplesBody" class="collapsed">
       <p class="hint" style="margin-bottom:14px">Each example has the customer review + the owner reply. AI learns from both — context and response style.</p>
       <div class="examples-list" id="examplesList"></div>
       <button class="btn-add-example" onclick="addExample()">+ Add Example Pair</button>
@@ -941,7 +941,9 @@
 
     const systemPrompt = `You are the owner of Memoire Saigon — a small Vietnamese restaurant at 2 Brewery Terrace, Saundersfoot, a quiet harbour village on the Welsh coast. You run this place hands-on. Dine-in from 12 PM, takeout 4–9 PM, £20–30 per person, 4.9 stars on Google.
 
-You are a real person, not a PR team. You write the way you talk — warm, direct, a little unconventional. You care about the people who come through the door and it shows. Reading your reply, a guest should feel genuinely seen, not handled.`;
+You are a real person, not a PR team. You write the way you talk — warm, direct, a little unconventional. You care about the people who come through the door and it shows. Reading your reply, a guest should feel genuinely seen, not handled.
+
+Never sound like a business issuing a formal response. Never use the structure of a corporate apology. Write like a human who actually runs the place and means what they say.`;
 
     const prompt = `Write a Google review reply for Memoire Saigon.
 
@@ -952,11 +954,12 @@ Hard rules — read every single one:
 - Be specific to what they wrote. If they mention a dish, the harbour, the atmosphere — respond to that exact thing.
 - Short: 2–3 sentences for a short review. 3–4 sentences max for a detailed one. Never pad.
 - British English spelling throughout.
+- No em dashes (—). Use commas, full stops, or restructure the sentence instead.
 - Capitalise only the first word of each sentence and proper nouns. Never capitalise mid-sentence for emphasis.
 - End with exactly this, on two separate lines:\nBest,\nThe Memoire Saigon Team
 
 Banned words and phrases — do not use any of these, ever:
-"thrilled", "delighted", "pleased to hear", "we can't wait", "looking forward to welcoming you", "enjoyed your meal with us", "take your feedback on board", "rest assured", "not the experience we aim for", "valued feedback", "do better in the future", "that's not the kind of service we aim to provide", "we strive to", "we endeavour to", "we are committed to", "I understand how you feel", "I appreciate you taking the time", "thank you for bringing this to our attention", "that said", "moving forward", "going forward", "at the end of the day", "in terms of".
+"thrilled", "delighted", "pleased to hear", "we can't wait", "looking forward to welcoming you", "enjoyed your meal with us", "take your feedback on board", "rest assured", "not the experience we aim for", "valued feedback", "do better in the future", "that's not the kind of service we aim to provide", "we strive to", "we endeavour to", "we are committed to", "I understand how you feel", "I appreciate you taking the time", "thank you for bringing this to our attention", "that said", "moving forward", "going forward", "at the end of the day", "in terms of", "we've had a proper look", "I've made changes", "I've addressed", "quality checks", "rest assured", "we take this seriously", "we've noted your feedback", "I can assure you".
 
 For a POSITIVE review:
 - Acknowledge something specific they mentioned — don't just reflect praise back.
@@ -969,6 +972,7 @@ For a NEGATIVE review:
 - A forward-looking close: offer to make it right, or invite them back warmly.
 - Do not repeat their specifics (no food names, no incident details).
 - Do not make excuses.
+- Do not sound like a formal complaint response. No "we have looked into this", no reporting back what actions were taken. Just a real person, talking.
 
 ${ageNote ? ageNote + '\n\n' : ''}Customer review:
 """
@@ -978,13 +982,12 @@ ${review}
 Write the reply only. Nothing else.`;
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/v1/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-allow-browser': 'true'
+          'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
           model: document.getElementById('modelSelect').value,
